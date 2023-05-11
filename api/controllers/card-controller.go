@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/BackendApiCardExam/api/config"
 	"github.com/BackendApiCardExam/api/models"
 	"github.com/BackendApiCardExam/api/utils"
@@ -14,7 +16,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var NewCard models.Card
+//var NewCard models.Card
 
 var db *gorm.DB
 
@@ -46,6 +48,43 @@ func CreateCard(w http.ResponseWriter, r *http.Request) {
 	res, _ := json.Marshal(CreateCard)
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
+}
+
+func CreateCardAuthUserOnly(w http.ResponseWriter, r *http.Request) {
+	secretkey := "my-secret-key"
+	if r.Header["Token"] == nil {
+		json.NewEncoder(w).Encode(errors.New("No token header found"))
+		return
+	}
+	var mySigningKey = []byte(secretkey)
+	token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
+		//check if token is parsed correctly
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			err := "There was an error in parsing"
+			json.NewEncoder(w).Encode(err)
+			return nil, fmt.Errorf("There was an error in parsing")
+		}
+		return mySigningKey, nil
+	})
+	if err != nil {
+		err := "Your Token has been expired"
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		if claims["role"] == "user" {
+			CreateCard := &models.Card{}
+			utils.ParseBody(r, CreateCard)
+			db.Create(CreateCard)
+			res, _ := json.Marshal(CreateCard)
+			w.WriteHeader(http.StatusOK)
+			w.Write(res)
+		} else {
+			w.WriteHeader(http.StatusUnauthorized)
+			res, _ := json.Marshal("not user")
+			w.Write(res)
+		}
+	}
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
