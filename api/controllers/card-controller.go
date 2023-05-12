@@ -26,6 +26,10 @@ func init() {
 	db.AutoMigrate(&models.Card{}, &models.Comment{}, &models.QuestionAnswer{}, &models.User{})
 }
 
+func Ping(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 func GetCardById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	bookId := vars["CardId"]
@@ -52,22 +56,16 @@ func CreateCard(w http.ResponseWriter, r *http.Request) {
 
 func CreateCardAuthUserOnly(w http.ResponseWriter, r *http.Request) {
 	secretkey := "my-secret-key"
-	if r.Header["Token"] == nil {
-		json.NewEncoder(w).Encode(errors.New("No token header found"))
-		return
-	}
 	var mySigningKey = []byte(secretkey)
 	token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
 		//check if token is parsed correctly
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			err := "There was an error in parsing"
-			json.NewEncoder(w).Encode(err)
-			return nil, fmt.Errorf("There was an error in parsing")
+			return nil, fmt.Errorf("token wasn't signed with HMAC method")
 		}
 		return mySigningKey, nil
 	})
 	if err != nil {
-		err := "Your Token has been expired"
+		err := "error while parsing token"
 		json.NewEncoder(w).Encode(err)
 		return
 	}
@@ -112,10 +110,10 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	var authDetails models.Authentication
 	utils.ParseBody(r, &authDetails)
 	var loggedUser models.User
-	db.Where("email = ?", authDetails.Email).First(&loggedUser)
-	if loggedUser.Email == "" {
-		fmt.Println("here")
-		err := errors.New("username or password incorrect")
+	db.Where("email = ?", authDetails.Email).Or("username = ?", authDetails.Username).First(&loggedUser)
+
+	if loggedUser.Email == "" && loggedUser.Username == "" {
+		err := errors.New("no such email or username")
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		return

@@ -13,6 +13,7 @@ var RegisterCardRoutes = func(router *mux.Router) {
 	router.HandleFunc("/v1/server/card/{CardId}", controllers.GetCardById).Methods("GET")
 	router.HandleFunc("/v1/server/signup", controllers.SignUp).Methods("POST")
 	router.HandleFunc("/v1/server/signin", controllers.SignIn).Methods("POST")
+	router.HandleFunc("/v1/server/ping", controllers.Ping).Methods("GET")
 	router.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
