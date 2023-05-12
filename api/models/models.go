@@ -39,15 +39,18 @@ type QuestionAnswer struct {
 
 type User struct {
 	gorm.Model
-	Name     string `json:"name"`
-	Email    string `gorm:"unique" json:"email"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
+	Username   string `json:"Username"`
+	Email      string `gorm:"unique" json:"Email"`
+	Password   string `json:"Password"`
+	University string `json:"University"`
+	Course     int    `json:"Course"`
+	Role       string `json:"Role"`
 }
 
 type Authentication struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"Email,omitempty"`
+	Username string `json:"Username,omitempty"`
+	Password string `json:"Password"`
 }
 
 type Token struct {
