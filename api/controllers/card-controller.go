@@ -30,6 +30,16 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func RecieveMinimalVerision(w http.ResponseWriter, r *http.Request) {
+	payload := []byte(`{
+  "VersionApi": 1,
+  "MinimalVersionMobileApp": 1
+}`)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(payload)
+
+}
+
 func GetCardById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	bookId := vars["CardId"]
@@ -132,4 +142,38 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	currentToken.TokenString = validToken
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(currentToken)
+}
+
+func GetUniversities(w http.ResponseWriter, r *http.Request) {
+	universities := []byte(`{
+  "questions": [
+    {
+      "Question": "Почему моего учебного заведения нет в списке?",
+      "Answer": "Если вашего учебного заведения нет в списке, заполните гугл форму"
+    },
+    {
+      "Question": "Что даёт регистрация?",
+      "Answer": "Регистрация открывает доступ ко всем возможностям CardExam"
+    },
+    {
+      "Question": "Для чего указывать почту?",
+      "Answer": "Для получения уведомлений и восстановления пароля"
+    },
+    {
+      "Question": "Что такое CardExam?",
+      "Answer": "Приложение позволяющее готовиться к любому материалу в той или иной форме"
+    },
+    {
+      "Question": "Могу ли я добавить карточку с экзаменом?",
+      "Answer": "Конечно, но для этого необходимо зарегистрироваться. Гостевой режим позволяет только смотреть и запускать карточки"
+    },
+    {
+      "Question": "uri:google.com",
+      "Answer": "Добавить свой ВУЗ"
+    }
+  ]
+}`)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(universities)
+
 }
