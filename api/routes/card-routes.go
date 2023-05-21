@@ -15,6 +15,7 @@ var RegisterCardRoutes = func(router *mux.Router) {
 	router.HandleFunc("/v1/server/signin", controllers.SignIn).Methods("POST")
 	router.HandleFunc("/v1/server/ping", controllers.Ping).Methods("GET")
 	router.HandleFunc("/v1/server/minimal_version", controllers.RecieveMinimalVerision).Methods("GET")
+	router.HandleFunc("/v1/server/questions_help", controllers.GetQuestions).Methods("GET")
 	router.HandleFunc("/v1/server/universities", controllers.GetUniversities).Methods("GET")
 	router.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "")

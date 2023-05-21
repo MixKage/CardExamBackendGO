@@ -30,6 +30,19 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func GetUniversities(w http.ResponseWriter, r *http.Request) {
+	universities := []byte(`{
+  "universities": [
+    "МИРЭА",
+    "Финансовый",
+    "ItHub"
+  ]
+}`)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(universities)
+}
+
 func RecieveMinimalVerision(w http.ResponseWriter, r *http.Request) {
 	payload := []byte(`{
   "VersionApi": 1,
@@ -37,7 +50,6 @@ func RecieveMinimalVerision(w http.ResponseWriter, r *http.Request) {
 }`)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(payload)
-
 }
 
 func GetCardById(w http.ResponseWriter, r *http.Request) {
@@ -144,8 +156,8 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(currentToken)
 }
 
-func GetUniversities(w http.ResponseWriter, r *http.Request) {
-	universities := []byte(`{
+func GetQuestions(w http.ResponseWriter, r *http.Request) {
+	questionsAnswers := []byte(`{
   "questions": [
     {
       "Question": "Почему моего учебного заведения нет в списке?",
@@ -174,6 +186,5 @@ func GetUniversities(w http.ResponseWriter, r *http.Request) {
   ]
 }`)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(universities)
-
+	w.Write(questionsAnswers)
 }
